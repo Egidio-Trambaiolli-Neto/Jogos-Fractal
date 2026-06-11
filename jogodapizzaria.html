@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Pizzaria - Frações</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #fce4ec; margin: 0; padding: 10px; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        h1 { color: #d32f2f; font-size: 24px; margin-top: 0; }
+        .info { font-size: 16px; margin: 10px 0; font-weight: bold; }
+        .pedido-caixa { background: #fff9c4; border: 2px dashed #f57f17; padding: 10px; font-size: 22px; font-weight: bold; border-radius: 5px; margin: 15px 0; }
+        .barra-tempo { width: 100%; background: #e0e0e0; height: 15px; border-radius: 10px; overflow: hidden; margin-bottom: 15px; }
+        .progresso-tempo { background: #4caf50; height: 100%; width: 100%; transition: width 0.1s linear; }
+        .pizzas-area { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 15px; }
+        .pizza { width: 100px; height: 100px; background: #ffe082; border-radius: 50%; position: relative; border: 2px solid #ffb300; }
+        .fatia { position: absolute; width: 50px; height: 50px; top: 0; left: 50%; transform-origin: 0% 100%; border: 1px solid #d32f2f; box-sizing: border-box; cursor: pointer; background: #e67e22; }
+        .fatia.selecionada { background: #c0392b; border: 2px solid #fff; }
+        .fatia:nth-child(1) { transform: rotate(0deg); }
+        .fatia:nth-child(2) { transform: rotate(45deg); }
+        .fatia:nth-child(3) { transform: rotate(90deg); }
+        .fatia:nth-child(4) { transform: rotate(135deg); }
+        .fatia:nth-child(5) { transform: rotate(180deg); }
+        .fatia:nth-child(6) { transform: rotate(225deg); }
+        .fatia:nth-child(7) { transform: rotate(270deg); }
+        .fatia:nth-child(8) { transform: rotate(315deg); }
+        .botoes { margin-top: 15px; }
+        button { background: #d32f2f; color: white; border: none; padding: 12px 25px; font-size: 18px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #b71c1c; }
+        .resultado-fase { font-size: 20px; color: #2e7d32; font-weight: bold; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Garçom das Frações</h1>
+    
+    <div id="jogo-tela">
+        <div class="info">
+            Fase: <span id="txt-fase">1</span>/3 | 
+            Entrega: <span id="txt-entrega">1</span>/10 | 
+            Erros: <span id="txt-erros">0</span>/3
+        </div>
+        
+        <div class="barra-tempo">
+            <div id="barra" class="progresso-tempo"></div>
+        </div>
+        
+        <div class="pedido-caixa">
+            Pedido do Cliente: <br>
+            <span id="txt-pedido">Carregando...</span>
+        </div>
+        
+        <div class="pizzas-area">
+            <div class="pizza" data-pizza="1">
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+            </div>
+            <div class="pizza" data-pizza="2">
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+            </div>
+            <div class="pizza" data-pizza="3">
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+            </div>
+            <div class="pizza" data-pizza="4">
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+                <div class="fatia" onclick="cliqueFatia(this)"></div><div class="fatia" onclick="cliqueFatia(this)"></div>
+            </div>
+        </div>
+        
+        <div class="botoes">
+            <button onclick="entregarPedido()">ENTREGAR PEDIDO</button>
+        </div>
+    </div>
+
+    <div id="tela-mensagem" style="display:none;">
+        <h2 id="msg-titulo">Fim de Jogo</h2>
+        <p id="msg-texto"></p>
+        <button id="btn-acao" onclick="reiniciarJogo()">Jogar Novamente</button>
+    </div>
+</div>
+
+<script>
+    // Configurações baseadas na nossa conversa estratégica
+    let fase = 1;
+    let entrega = 1;
+    let erros = 0;
+    let fatiasCorretasNecessarias = 0;
+    let tempoRestante = 0;
+    let tempoMaximoFase = [25, 15, 10]; // Tempos corrigidos: Fase 1 = 25s, Fase 2 = 15s, Fase 3 = 10s
+    let cronometro;
+
+    function iniciarFase() {
+        if (fase > 3) {
+            finalizarJogo(true);
+            return;
+        }
+        entrega = 1;
+        proximoPedido();
+    }
+
+    function proximoPedido() {
+        if (entrega > 10) {
+            fase++;
+            if (fase > 3) {
+                finalizarJogo(true);
+            } else {
+                alert("Parabéns! Você passou para a Fase " + fase);
+                iniciarFase();
+            }
+            return;
+        }
+
+        document.getElementById("txt-fase").innerText = fase;
+        document.getElementById("txt-entrega").innerText = entrega;
+        document.getElementById("txt-erros").innerText = erros;
+
+        // Limpar fatias selecionadas anteriormente
+        let fatias = document.querySelectorAll('.fatia');
+        fatias.forEach(f => f.classList.remove('selecionada'));
+
+        // Gerar pedido aleatório até 32 fatias
+        fatiasCorretasNecessarias = Math.floor(Math.random() * 31) + 1; 
+        configurarTextoPedido(fatiasCorretasNecessarias);
+
+        // Iniciar Cronômetro da entrega atual
+        tempoRestante = tempoMaximoFase[fase - 1];
+        atualizarBarraTempo();
+        clearInterval(cronometro);
+        cronometro = setInterval(contarTempo, 100);
+    }
+
+    function configurarTextoPedido(totalFatias) {
+        let inteiros = Math.floor(totalFatias / 8);
+        let sobra = totalFatias % 8;
+        let texto = "";
+
+        if (inteiros > 0) {
+            texto += inteiros + (inteiros === 1 ? " pizza inteira" : " pizzas inteiras");
+        }
+
+        if (sobra > 0) {
+            if (texto !== "") texto += " e ";
+            // Representação em fração simplificada ou comum de base 8
+            if (sobra === 2) texto += "1/4 de pizza";
+            else if (sobra === 4) texto += "2/4 de pizza";
+            else if (sobra === 6) texto += "3/4 de pizza";
+            else texto += sobra + "/8 de pizza";
+        }
+        
+        // Adiciona a representação puramente numérica como pedido
+        let numTexto = "";
+        if (inteiros > 0) numTexto += inteiros + " ";
+        if (sobra > 0) {
+            if (sobra === 2) numTexto += "1/4";
+            else if (sobra === 4) numTexto += "2/4";
+            else if (sobra === 6) numTexto += "3/4";
+            else numTexto += sobra + "/8";
+        } else {
+            numTexto = inteiros.toString();
+        }
+
+        document.getElementById("txt-pedido").innerHTML = texto + "<br><span style='color:#d32f2f;'>(" + numTexto + ")</span>";
+    }
+
+    function cliqueFatia(elemento) {
+        elemento.classList.toggle('selecionada');
+    }
+
+    function contarTempo() {
+        tempoRestante -= 0.1;
+        if (tempoRestante <= 0) {
+            tempoRestante = 0;
+            atualizarBarraTempo();
+            clearInterval(cronometro);
+            computarErro("O tempo acabou!");
+        } else {
+            atualizarBarraTempo();
+        }
+    }
+
+    function atualizarBarraTempo() {
+        let max = tempoMaximoFase[fase - 1];
+        let porcentagem = (tempoRestante / max) * 100;
+        document.getElementById("barra").style.width = porcentagem + "%";
+    }
+
+    function entregarPedido() {
+        clearInterval(cronometro);
+        let fatiasSelecionadas = document.querySelectorAll('.fatia.selecionada').length;
+
+        if (fatiasSelecionadas === fatiasCorretasNecessarias) {
+            entrega++;
+            proximoPedido();
+        } else {
+            computarErro("Quantidade incorreta de fatias!");
+        }
+    }
+
+    function computarErro(motivo) {
+        erros++;
+        document.getElementById("txt-erros").innerText = erros;
+        if (erros >= 3) {
+            finalizarJogo(false);
+        } else {
+            alert(motivo + " Você cometeu um erro. Vamos para a próxima entrega.");
+            entrega++;
+            proximoPedido();
+        }
+    }
+
+    function finalizarJogo(vitoria) {
+        clearInterval(cronometro);
+        document.getElementById("jogo-tela").style.display = "none";
+        document.getElementById("tela-mensagem").style.display = "block";
+
+        if (vitoria) {
+            document.getElementById("msg-titulo").innerText = "Parabéns, Chefe!";
+            document.getElementById("msg-texto").innerText = "Você concluiu todas as fases com sucesso e entregou todas as pizzas corretamente!";
+            document.getElementById("btn-acao").innerText = "Jogar de Novo";
+        } else {
+            document.getElementById("msg-titulo").innerText = "Fim de Jogo!";
+            document.getElementById("msg-texto").innerText = "Você acumulou 3 erros nesta tentativa.";
+            document.getElementById("btn-acao").innerText = "Tentar Novamente esta Fase";
+        }
+    }
+
+    function reiniciarJogo() {
+        // Se perdeu, reinicia APENAS a fase atual, respeitando a nossa decisão pedagógica
+        if (erros >= 3) {
+            erros = 0;
+        } else {
+            // Se ganhou e quer jogar de novo, reseta tudo
+            fase = 1;
+            erros = 0;
+        }
+        document.getElementById("jogo-tela").style.display = "block";
+        document.getElementById("tela-mensagem").style.display = "none";
+        iniciarFase();
+    }
+
+    // Início automático do jogo ao abrir
+    iniciarFase();
+</script>
+
+</body>
+</html>
